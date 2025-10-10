@@ -1,1 +1,0 @@
--- PostgreSQL functions for air quality queries
