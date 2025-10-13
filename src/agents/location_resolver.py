@@ -62,6 +62,7 @@ class LocationResolverAgent(AgentBase):
                     "name": self._get_location_name(loc),
                     "display_name": self._format_display_name(loc),
                     "state": loc.get("state_name", ""),
+                    "state_code": loc.get("state_code", ""),  # Add state_code for PM data agent
                     "district": loc.get("district_name", ""),
                     "parent": loc.get("parent_name", ""),
                    # "raw": loc  # Keep original data

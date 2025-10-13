@@ -41,6 +41,17 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
+def _is_forecast_query(query_text: str) -> bool:
+    """Determine if query is asking for forecast vs current data"""
+    query_lower = query_text.lower()
+    forecast_keywords = [
+        'forecast', 'predict', 'predicted', 'prediction', 'tomorrow', 
+        'will be', 'future', 'next day', 'next week', 'coming days',
+        'expected', 'anticipate', 'ahead', 'upcoming'
+    ]
+    return any(keyword in query_lower for keyword in forecast_keywords)
+
+
 @app.on_event("startup")
 async def startup_event():
     """Initialize DB connection and workflow once on app startup."""
@@ -57,6 +68,12 @@ async def startup_event():
         pm_agent = PMDataAgent(db)
         workflow = PMQueryWorkflow(location_agent, pm_agent)
         
+        # Initialize forecast agent and workflow
+        from src.agents.pm_forecast_agent import PMForecastAgent
+        from src.graphs.pm_forecast_workflow import PMForecastWorkflow
+        forecast_agent = PMForecastAgent(db)
+        forecast_workflow = PMForecastWorkflow(location_agent, forecast_agent)
+        
         print("[API] ✅ Agents initialized successfully")
         
         # Attach to app state for reuse
@@ -64,12 +81,25 @@ async def startup_event():
         app.state.location_agent = location_agent
         app.state.pm_agent = pm_agent
         app.state.workflow = workflow
+        app.state.forecast_agent = forecast_agent
+        app.state.forecast_workflow = forecast_workflow
         
-        # Create helper function for processing
+        # Create helper function
         async def _process_with_agents(query_text: str):
-            """Process query through workflow"""
+            """Process query through appropriate workflow (current or forecast)"""
             print(f"\n[API] Processing query: '{query_text}'")
-            state = await workflow.process_query(query_text)
+            
+            # Determine if this is a forecast query
+            is_forecast = _is_forecast_query(query_text)
+            print(f"[API] Query type: {'Forecast' if is_forecast else 'Current'}")
+            
+            if is_forecast:
+                state = await forecast_workflow.process_query(query_text)
+                # Rename forecast_data to pm_data for consistent API response
+                if state.get('forecast_data'):
+                    state['pm_data'] = state['forecast_data']
+            else:
+                state = await workflow.process_query(query_text)
             
             # Enhanced debug logging
             print(f"[API] Workflow returned state:")
@@ -227,8 +257,19 @@ async def post_query_selection(req: Request):
         
         print(f"[API] Selected location: {locations[idx].get('name')} ({locations[idx].get('level')})")
         
+        # Determine which workflow to use based on original query
+        original_query = state.get('user_query', '')
+        is_forecast = _is_forecast_query(original_query)
+        print(f"[API] Continuing with {'forecast' if is_forecast else 'current'} workflow")
+        
         # Continue workflow with selection
-        new_state = await app.state.workflow.continue_with_selection(state, idx)
+        if is_forecast:
+            new_state = await app.state.forecast_workflow.continue_with_selection(state, idx)
+            # Rename forecast_data to pm_data for consistent API response
+            if new_state.get('forecast_data'):
+                new_state['pm_data'] = new_state['forecast_data']
+        else:
+            new_state = await app.state.workflow.continue_with_selection(state, idx)
         
         print(f"[API] Selection processed:")
         print(f"  - Has response: {bool(new_state.get('response'))}")

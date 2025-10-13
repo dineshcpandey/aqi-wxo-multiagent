@@ -215,9 +215,7 @@ class PMQueryWorkflow:
 
         
         pm_result = await self.pm_agent.run({
-            "location_code": loc.get("code"),
-            "location_level": loc.get("level"),
-            "location_name": loc.get("name"),
+            "location": loc  # Pass the complete location object with state_code
         })
         
         if not pm_result.get("success"):
@@ -259,9 +257,7 @@ class PMQueryWorkflow:
         print(f"[Workflow] Fetching PM data for code={loc.get('code')}, level={loc.get('level')}")
         
         pm_result = await self.pm_agent.run({
-            "location_code": loc.get("code"),
-            "location_level": loc.get("level"),
-            "location_name": loc.get("name"),
+            "location": loc  # Pass the complete location object with state_code
         })
         
         if not pm_result.get("success"):
