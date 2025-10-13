@@ -111,6 +111,88 @@ def _show_raw_data(raw: Any):
         st.json(raw)
 
 
+def _show_forecast_chart(chart_data: List[Dict], chart_type: str = None):
+    """Display forecast chart"""
+    print(f"[DEBUG] _show_forecast_chart called with {len(chart_data) if chart_data else 0} data points")
+    
+    if not chart_data:
+        print(f"[DEBUG] No chart data to display")
+        return
+    
+    try:
+        import pandas as pd
+        import plotly.express as px
+        from datetime import datetime
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(chart_data)
+        
+        # Ensure we have the required columns
+        if 'pm25' not in df.columns or 'time' not in df.columns:
+            print(f"[ERROR] Chart data missing required columns. Available: {df.columns.tolist()}")
+            return
+        
+        # Convert time column to datetime if it's not already
+        if 'timestamp' not in df.columns:
+            df['timestamp'] = pd.to_datetime(df['time'])
+        
+        # Sort by timestamp
+        df = df.sort_values('timestamp')
+        
+        # Create the forecast chart
+        fig = px.line(
+            df, 
+            x='timestamp', 
+            y='pm25',
+            title='📈 PM2.5 Hourly Forecast',
+            labels={'pm25': 'PM2.5 (µg/m³)', 'timestamp': 'Time'},
+            line_shape='spline'
+        )
+        
+        # Customize the chart
+        fig.update_layout(
+            height=400,
+            showlegend=False,
+            xaxis_title="Time",
+            yaxis_title="PM2.5 (µg/m³)",
+            font=dict(size=12),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)'
+        )
+        
+        # Add color zones for air quality categories
+        fig.add_hline(y=30, line_dash="dash", line_color="green", 
+                     annotation_text="Good (≤30)", annotation_position="bottom right")
+        fig.add_hline(y=60, line_dash="dash", line_color="yellow", 
+                     annotation_text="Satisfactory (≤60)", annotation_position="bottom right")
+        fig.add_hline(y=90, line_dash="dash", line_color="orange", 
+                     annotation_text="Moderate (≤90)", annotation_position="bottom right")
+        fig.add_hline(y=120, line_dash="dash", line_color="red", 
+                     annotation_text="Poor (≤120)", annotation_position="bottom right")
+        
+        # Display the chart
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Show statistics
+        avg_pm25 = df['pm25'].mean()
+        max_pm25 = df['pm25'].max()
+        min_pm25 = df['pm25'].min()
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("📊 Average", f"{avg_pm25:.1f} µg/m³")
+        with col2:
+            st.metric("📈 Peak", f"{max_pm25:.1f} µg/m³")
+        with col3:
+            st.metric("📉 Minimum", f"{min_pm25:.1f} µg/m³")
+            
+    except ImportError:
+        st.error("📊 Chart display requires plotly. Please install: pip install plotly")
+    except Exception as e:
+        print(f"[ERROR] Error displaying chart: {e}")
+        st.error(f"📊 Error displaying chart: {e}")
+
+
 def main():
     print("[DEBUG] main() called - initializing Streamlit app")
     st.set_page_config(
@@ -195,10 +277,18 @@ def main():
                                         data = result.get('data', {})
                                         formatted = data.get('formatted_response')
                                         raw = data.get('raw_data')
+                                        has_chart = data.get('has_chart', False)
+                                        chart_data = data.get('chart_data', [])
+                                        chart_type = data.get('chart_type')
                                         print(f"[DEBUG] Selection formatted response: {formatted}")
+                                        print(f"[DEBUG] Has chart: {has_chart}, Chart data points: {len(chart_data) if chart_data else 0}")
                                         if formatted:
-                                            _append_message('assistant', formatted)
-                                            _show_raw_data(raw)
+                                            _append_message('assistant', formatted, metadata={
+                                                'raw_data': raw,
+                                                'has_chart': has_chart,
+                                                'chart_data': chart_data,
+                                                'chart_type': chart_type
+                                            })
                                         else:
                                             _append_message('assistant', "No data received from backend")
                                     # Clear selection state
@@ -206,10 +296,16 @@ def main():
                                     st.session_state.waiting_for_selection = False
                                     st.session_state.workflow_state = None
                                     st.rerun()
+                # Show chart if present
+                metadata = message.get('metadata', {})
+                if metadata.get('has_chart') and metadata.get('chart_data'):
+                    print(f"[DEBUG] Displaying chart for message")
+                    _show_forecast_chart(metadata['chart_data'], metadata.get('chart_type'))
+                
                 # Show raw data if present
-                if message.get('metadata', {}).get('raw_data'):
+                if metadata.get('raw_data'):
                     print(f"[DEBUG] Showing raw data for message")
-                    _show_raw_data(message['metadata']['raw_data'])
+                    _show_raw_data(metadata['raw_data'])
 
         # Chat input (disabled when waiting for selection)
         print(f"[DEBUG] Waiting for selection: {st.session_state.waiting_for_selection}")
@@ -259,12 +355,21 @@ def main():
                 # Direct response
                 formatted = data.get('formatted_response')
                 raw = data.get('raw_data')
+                has_chart = data.get('has_chart', False)
+                chart_data = data.get('chart_data', [])
+                chart_type = data.get('chart_type')
                 print(f"2. [Streamlit] Formatted response: {formatted}")
+                print(f"[DEBUG] Has chart: {has_chart}, Chart data points: {len(chart_data) if chart_data else 0}")
                 if formatted:
                     _append_message(
                         'assistant', 
                         formatted,
-                        metadata={'raw_data': raw} if raw else None
+                        metadata={
+                            'raw_data': raw,
+                            'has_chart': has_chart,
+                            'chart_data': chart_data,
+                            'chart_type': chart_type
+                        }
                     )
                 else:
                     _append_message('assistant', "No response received from backend")

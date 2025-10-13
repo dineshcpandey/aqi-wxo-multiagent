@@ -7,12 +7,7 @@ class ResponseFormatter:
     """Formats agent responses for chat display with chart support"""
     
     def __init__(self):
-        self.chart_generators = {
-            'time_series': self._generate_time_series_chart,
-            'comparison': self._generate_comparison_chart,
-            'hotspot': self._generate_hotspot_map,
-            'distribution': self._generate_distribution_chart
-        }
+        pass
     
     def format_response(self, 
                        query_type: str,
@@ -31,6 +26,8 @@ class ResponseFormatter:
         # Format based on query type
         if query_type == "current_reading":
             response.update(self._format_current_reading(data))
+        elif query_type == "forecast":
+            response.update(self._format_forecast(data))
         elif query_type == "time_series":
             response.update(self._format_time_series(data))
         elif query_type == "comparison":
@@ -61,6 +58,83 @@ class ResponseFormatter:
         return {
             "text_response": text,
             "has_chart": False
+        }
+    
+    def _format_forecast(self, data: Dict) -> Dict:
+        """Format forecast response with time series chart"""
+        forecast_value = data.get('forecast_pm25') or data.get('predicted_pm25')
+        forecast_days = data.get('forecast_days', 1)
+        location_info = data.get('location', {})
+        location_name = location_info.get('name', 'Unknown')
+        time_series = data.get('pm25_time_series', [])
+        
+        # Determine air quality category for forecast
+        category, emoji = self._get_air_quality_category('PM2.5', forecast_value)
+        
+        # Format forecast period
+        if forecast_days == 1:
+            period_text = "Next 24 hours"
+        else:
+            period_text = f"Next {forecast_days} days"
+        
+        # Create main forecast text
+        forecast_text = f"{emoji} **PM2.5 Forecast for {location_name}**\n\n"
+        
+        if forecast_value is not None:
+            forecast_text += f"📊 **Predicted Level:** {forecast_value:.1f} µg/m³\n"
+            forecast_text += f"📈 **Expected Air Quality:** {category}\n"
+        
+        forecast_text += f"⏰ **Forecast Period:** {period_text}\n"
+        
+        # Add sensor count if available
+        if data.get('sensor_count'):
+            forecast_text += f"📡 **Data Sources:** {data['sensor_count']} monitoring stations\n"
+        
+        # Add health advisory for poor forecasted air quality
+        if forecast_value and forecast_value > 90:
+            forecast_text += "\n⚠️ **Health Advisory for Forecasted Period:**\n"
+            if forecast_value > 250:
+                forecast_text += "- Plan to avoid all outdoor activities\n- Keep windows closed\n- Consider using air purifiers"
+            elif forecast_value > 120:
+                forecast_text += "- Plan to limit prolonged outdoor activities\n- Sensitive groups should consider staying indoors"
+            else:
+                forecast_text += "- Monitor air quality and limit outdoor exposure if needed"
+        
+        # Check if we have time series data for chart
+        has_chart = bool(time_series) and len(time_series) > 0
+        chart_data = None
+        
+        if has_chart:
+            # Convert time series to DataFrame for charting
+            try:
+                import pandas as pd
+                from datetime import datetime
+                
+                # Prepare chart data
+                chart_records = []
+                for point in time_series:
+                    chart_records.append({
+                        'time': point.get('target_time'),
+                        'pm25': float(point.get('pm25', 0)),
+                        'timestamp': pd.to_datetime(point.get('target_time'))
+                    })
+                
+                chart_data = pd.DataFrame(chart_records)
+                if not chart_data.empty:
+                    # Sort by timestamp
+                    chart_data = chart_data.sort_values('timestamp')
+                    forecast_text += f"\n📈 **Hourly forecast chart showing {len(chart_data)} data points**"
+                
+            except Exception as e:
+                print(f"Error preparing chart data: {e}")
+                has_chart = False
+                chart_data = None
+        
+        return {
+            "text_response": forecast_text,
+            "has_chart": has_chart,
+            "chart_data": chart_data,
+            "chart_type": "forecast_time_series"
         }
     
     def _format_time_series(self, data: List[Dict]) -> Dict:

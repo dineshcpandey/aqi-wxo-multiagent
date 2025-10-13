@@ -109,57 +109,24 @@ class PMForecastWorkflow:
             return "Very Poor", "🟣"
         return "Severe", "🟤"
 
-    def _format_forecast_response(self, forecast_data: Dict, location: Dict) -> str:
-        """Format forecast data into a user-friendly response"""
-        forecast_pm25 = forecast_data.get("forecast_pm25")
-        forecast_days = forecast_data.get("forecast_days", 1)
-        category, emoji = self._get_air_quality_category(forecast_pm25)
+    def _format_forecast_response(self, forecast_data: Dict, location: Dict) -> Dict:
+        """Format forecast data into a user-friendly response with chart data"""
+        import sys
+        import os
+        sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+        from agents.response_formatter import ResponseFormatter
         
-        location_name = location.get("name", "Unknown")
-        location_level = location.get("level", "")
+        # Prepare data for response formatter
+        formatter_data = {
+            **forecast_data,
+            'location': location
+        }
         
-        # Format PM value
-        if forecast_pm25 is None:
-            pm_text = "N/A"
-        else:
-            try:
-                pm_text = f"{forecast_pm25:.1f}"
-            except:
-                pm_text = str(forecast_pm25)
+        # Use response formatter to handle text and chart generation
+        formatter = ResponseFormatter()
+        formatted_response = formatter.format_response("forecast", formatter_data)
         
-        # Build response with forecast-specific language
-        if forecast_days == 1:
-            period_text = "Next 24 hours"
-        else:
-            period_text = f"Next {forecast_days} days"
-        
-        response = f"🔮 **PM2.5 Forecast for {location_name}**\n\n"
-        response += f"📊 **Predicted Level:** {pm_text} µg/m³\n"
-        response += f"📈 **Expected Air Quality:** {category}\n"
-        response += f"⏰ **Forecast Period:** {period_text}\n"
-        
-        if location_level:
-            response += f"📍 **Location Type:** {location_level.replace('_', ' ').title()}\n"
-        
-        # Add sensor count if available
-        if forecast_data.get("sensor_count"):
-            response += f"📡 **Data Sources:** {forecast_data['sensor_count']} monitoring stations\n"
-        
-        # Add health advisory for poor forecasted air quality
-        if forecast_pm25 and forecast_pm25 > 90:
-            response += "\n⚠️ **Health Advisory for Forecasted Period:**\n"
-            if forecast_pm25 > 250:
-                response += "- Plan to avoid all outdoor activities\n- Keep windows closed\n- Consider using air purifiers"
-            elif forecast_pm25 > 120:
-                response += "- Plan to limit prolonged outdoor activities\n- Sensitive groups should consider staying indoors"
-            else:
-                response += "- Monitor air quality and limit outdoor exposure if needed"
-        
-        # Add time series chart note
-        if forecast_data.get("pm25_time_series"):
-            response += f"\n📈 **Hourly forecast chart available below**"
-        
-        return response
+        return formatted_response
 
     async def process_query(self, query: str) -> PMForecastState:
         """Process user query and return forecast data or disambiguation options"""
@@ -232,8 +199,12 @@ class PMForecastWorkflow:
         state["forecast_data"] = forecast_result
         
         # Format response
-        state["response"] = self._format_forecast_response(forecast_result, loc)
-        print(f"[ForecastWorkflow] Successfully generated forecast response")
+        formatted_response = self._format_forecast_response(forecast_result, loc)
+        state["response"] = formatted_response.get("text_response", "")
+        state["chart_data"] = formatted_response.get("chart_data")
+        state["has_chart"] = formatted_response.get("has_chart", False)
+        state["chart_type"] = formatted_response.get("chart_type")
+        print(f"[ForecastWorkflow] Successfully generated forecast response with chart: {state['has_chart']}")
         
         return state
 
@@ -270,7 +241,11 @@ class PMForecastWorkflow:
         state["forecast_data"] = forecast_result
         
         # Format response
-        state["response"] = self._format_forecast_response(forecast_result, loc)
-        print(f"[ForecastWorkflow] Successfully generated forecast response after selection")
+        formatted_response = self._format_forecast_response(forecast_result, loc)
+        state["response"] = formatted_response.get("text_response", "")
+        state["chart_data"] = formatted_response.get("chart_data")
+        state["has_chart"] = formatted_response.get("has_chart", False)
+        state["chart_type"] = formatted_response.get("chart_type")
+        print(f"[ForecastWorkflow] Successfully generated forecast response after selection with chart: {state['has_chart']}")
         
         return state

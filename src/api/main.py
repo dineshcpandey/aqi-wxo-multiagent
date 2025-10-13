@@ -174,7 +174,10 @@ async def post_query(req: Request):
         resp = {
             "data": {
                 "formatted_response": state.get('response'),
-                "raw_data": state.get('pm_data')
+                "raw_data": state.get('pm_data'),
+                "has_chart": state.get('has_chart', False),
+                "chart_type": state.get('chart_type'),
+                "chart_data": state.get('chart_data').to_dict('records') if state.get('chart_data') is not None else None
             },
             "state": state,
             "query_metadata": {
@@ -281,7 +284,10 @@ async def post_query_selection(req: Request):
         resp = {
             "data": {
                 "formatted_response": new_state.get('response'),
-                "raw_data": new_state.get('pm_data')
+                "raw_data": new_state.get('pm_data'),
+                "has_chart": new_state.get('has_chart', False),
+                "chart_type": new_state.get('chart_type'),
+                "chart_data": new_state.get('chart_data').to_dict('records') if new_state.get('chart_data') is not None else None
             },
             "query_metadata": {
                 "confidence": 1.0,
