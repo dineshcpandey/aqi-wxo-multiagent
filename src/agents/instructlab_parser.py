@@ -7,45 +7,29 @@ import aiohttp
 from .query_parser import ParsedQuery
 
 @dataclass
-class InstructLabConfig:
-    model_path: str = "models/mistral-7b-instruct-v0.2.Q4_K_M.gguf"
-    endpoint: str = "http://localhost:8000/v1/chat/completions"  # InstructLab endpoint
+class FineTunedModelConfig:
+    endpoint: str = "http://localhost:8000/inference"  # Fine-tuned model inference endpoint
     temperature: float = 0.1  # Low for consistency
     max_tokens: int = 150
+    model_name: str = "air-quality-parser"  # Fine-tuned model name
 
-class InstructLabParser:
-    """LLM-based query parser using InstructLab"""
+class FineTunedParser:
+    """LLM-based query parser using fine-tuned model"""
     
-    def __init__(self, config: Optional[InstructLabConfig] = None):
-        self.config = config or InstructLabConfig()
+    def __init__(self, config: Optional[FineTunedModelConfig] = None):
+        self.config = config or FineTunedModelConfig()
         self.prompt_template = self._load_prompt_template()
         
     def _load_prompt_template(self) -> str:
-        """Load the prompt template for query parsing"""
-        return """You are a query parser for an air quality monitoring system.
-        
-Available database functions:
-1. gis.search_location_json(location_text) - Search for location
-2. gis.get_current_pm25(code, level) - Get current PM2.5 value
-3. gis.get_pm25_trend(code, level, duration, unit) - Get historical trend
-
-Parse the user query and extract:
-- intent: current_reading|trend|comparison|forecast|hotspot|unknown
-- location: the location mentioned
-- metric: pm25|aqi|no2|so2 (default: pm25)
-- duration: number (if time period mentioned)
-- unit: hours|days|weeks|months
-
-User Query: {query}
-
-Return JSON only:"""
+        """Load the prompt template for fine-tuned model (matches training format)"""
+        return "### Question: {query}\n\n### Answer: "
 
     async def parse(self, query: str) -> ParsedQuery:
-        """Parse query using InstructLab model"""
+        """Parse query using fine-tuned model"""
         prompt = self.prompt_template.format(query=query)
         
         try:
-            response = await self._call_instructlab(prompt)
+            response = await self._call_finetuned_model(prompt)
             parsed = self._extract_json(response)
             
             return ParsedQuery(
@@ -62,3 +46,73 @@ Return JSON only:"""
                 confidence=0.0,
                 raw_query=query
             )
+    
+    async def _call_finetuned_model(self, prompt: str) -> str:
+        """Make API call to fine-tuned model using query parameter"""
+        import urllib.parse
+        
+        # Extract just the query from the prompt (remove "### Question: " and "### Answer: ")
+        query = prompt.replace("### Question: ", "").replace("\n\n### Answer: ", "")
+        
+        # URL encode the query for the parameter
+        encoded_query = urllib.parse.quote(f'"{query}"')
+        
+        # Build the full URL with query parameter
+        url = f"{self.config.endpoint}?query={encoded_query}"
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    # Handle your specific response format: {"message": "JSON_STRING"}
+                    if isinstance(result, dict) and "message" in result:
+                        return result["message"].strip()
+                    elif isinstance(result, dict):
+                        # If response is already a dict (JSON), return it as string for _extract_json
+                        return json.dumps(result)
+                    elif isinstance(result, str):
+                        return result.strip()
+                    else:
+                        # Fallback: return the whole response as string
+                        return str(result)
+                else:
+                    raise Exception(f"Fine-tuned model API error: {response.status}")
+    
+    def _extract_json(self, response: str) -> Dict[str, Any]:
+        """Extract JSON from LLM response"""
+        try:
+            # Try to parse the entire response as JSON
+            return json.loads(response)
+        except json.JSONDecodeError:
+            # Try to find JSON within the response
+            import re
+            json_match = re.search(r'\{.*\}', response, re.DOTALL)
+            if json_match:
+                try:
+                    return json.loads(json_match.group())
+                except json.JSONDecodeError:
+                    pass
+            
+            # Fallback: manual parsing for common patterns
+            return self._manual_parse(response)
+    
+    def _manual_parse(self, response: str) -> Dict[str, Any]:
+        """Manual parsing as fallback"""
+        result = {
+            "intent": "unknown",
+            "entities": {},
+            "confidence": 0.5
+        }
+        
+        # Simple pattern matching
+        if "current" in response.lower() or "pm" in response.lower():
+            result["intent"] = "current_reading"
+            result["confidence"] = 0.6
+        elif "trend" in response.lower() or "history" in response.lower():
+            result["intent"] = "trend"
+            result["confidence"] = 0.6
+        elif "compare" in response.lower() or "vs" in response.lower():
+            result["intent"] = "comparison"
+            result["confidence"] = 0.6
+        
+        return result

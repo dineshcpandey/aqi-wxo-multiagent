@@ -1,6 +1,7 @@
 # src/graphs/pm_query_workflow.py
 from typing import Dict, Any, Optional, TypedDict, List, Tuple
 import re
+from src.agents.hybrid_parser import HybridQueryParser
 
 
 class PMQueryState(TypedDict):
@@ -16,11 +17,18 @@ class PMQueryState(TypedDict):
 
 
 class PMQueryWorkflow:
-    """Workflow to resolve location and fetch PM2.5 values with improved location extraction."""
+    """Workflow to resolve location and fetch PM2.5 values with hybrid parsing."""
 
-    def __init__(self, location_agent, pm_agent):
+    def __init__(self, location_agent, pm_agent, use_hybrid_parser=True, shadow_mode=True):
         self.location_agent = location_agent
         self.pm_agent = pm_agent
+        self.use_hybrid_parser = use_hybrid_parser
+        
+        # Initialize hybrid parser if enabled
+        if self.use_hybrid_parser:
+            self.hybrid_parser = HybridQueryParser(shadow_mode=shadow_mode)
+        else:
+            self.hybrid_parser = None
 
     def _extract_location_from_query(self, query: str) -> str:
         """Extract location from natural language query with improved logic"""
@@ -152,6 +160,62 @@ class PMQueryWorkflow:
                 response += "- Sensitive individuals should limit outdoor exposure"
         
         return response
+    
+    def get_parsing_stats(self) -> Dict[str, Any]:
+        """Get parsing comparison statistics"""
+        if self.hybrid_parser:
+            return self.hybrid_parser.get_comparison_stats()
+        return {"error": "Hybrid parser not enabled"}
+    
+    def get_recent_comparisons(self, limit: int = 10) -> List[Dict[str, Any]]:
+        """Get recent parsing comparisons for analysis"""
+        if self.hybrid_parser:
+            return self.hybrid_parser.comparison_log[-limit:]
+        return []
+
+    async def _extract_location_with_hybrid_parser(self, query: str) -> Tuple[str, Dict[str, Any]]:
+        """Extract location using hybrid parser"""
+        if self.hybrid_parser:
+            print(f"[Workflow] Using hybrid parser for query: '{query}'")
+            parsed_query = await self.hybrid_parser.parse(query)
+            
+            print(f"[Workflow] Parsed intent: {parsed_query.intent}")
+            print(f"[Workflow] Parsed entities: {parsed_query.entities}")
+            print(f"[Workflow] Confidence: {parsed_query.confidence}")
+            
+            # Extract location from parsed entities with better logic
+            location = ""
+            entities = parsed_query.entities
+            
+            # Check for location in entities
+            if 'location' in entities:
+                location = entities['location']
+                # Clean up common parsing artifacts
+                location = location.replace(' today', '').replace(' now', '').strip()
+            
+            # Check for multiple locations (for comparison queries)
+            elif 'locations' in entities and isinstance(entities['locations'], list):
+                # For now, take the first location
+                if entities['locations']:
+                    location = entities['locations'][0]
+            
+            # If no location found in entities or confidence is low, fallback to regex
+            if not location or parsed_query.confidence < 0.6:
+                fallback_location = self._extract_location_from_query(query)
+                if fallback_location and (not location or len(fallback_location) > len(location)):
+                    location = fallback_location
+                    print(f"[Workflow] Used fallback regex extraction: '{location}'")
+            
+            return location, {
+                "intent": parsed_query.intent,
+                "confidence": parsed_query.confidence,
+                "entities": parsed_query.entities,
+                "method": "hybrid"
+            }
+        else:
+            # Use legacy method
+            location = self._extract_location_from_query(query)
+            return location, {"method": "regex", "confidence": 0.8}
 
     async def process_query(self, query: str) -> PMQueryState:
         """Process a natural language query about PM2.5"""
@@ -170,9 +234,15 @@ class PMQueryWorkflow:
             "waiting_for_user": False,
         }
         
-        # Extract location from query
-        location_term = self._extract_location_from_query(query)
+        # Extract location from query using hybrid parser
+        location_term, parse_info = await self._extract_location_with_hybrid_parser(query)
         state["location_search_term"] = location_term
+        
+        # Log parsing information
+        print(f"[Workflow] Parsing method: {parse_info.get('method', 'hybrid')}")
+        print(f"[Workflow] Parse confidence: {parse_info.get('confidence', 'N/A')}")
+        if 'intent' in parse_info:
+            print(f"[Workflow] Detected intent: {parse_info['intent']}")
         
         if not location_term:
             state["error"] = "Could not identify a location in your query. Please specify a location."

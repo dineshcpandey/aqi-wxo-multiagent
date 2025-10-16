@@ -1,0 +1,394 @@
+[
+  {
+    "query": "What is PM2.5 in Delhi?",
+    "response": {"intent": "current_reading", "entities": {"location": "Delhi", "metric": "pm25"}, "confidence": 0.95}
+  },
+  {
+    "query": "Delhi PM readings now",
+    "response": {"intent": "current_reading", "entities": {"location": "Delhi", "metric": "pm25"}, "confidence": 0.9}
+  },
+  {
+    "query": "Compare air quality between Delhi and Mumbai",
+    "response": {"intent": "comparison", "entities": {"locations": ["Delhi", "Mumbai"], "metric": "aqi"}, "confidence": 0.85}
+  },
+  {
+    "query": "PM2.5 trend for Delhi last 24 hours",
+    "response": {"intent": "trend", "entities": {"location": "Delhi", "metric": "pm25", "duration": 24, "unit": "hours"}, "confidence": 0.9}
+  },
+  {
+    "query": "Is it safe to exercise in Bangalore today?",
+    "response": {"intent": "health", "entities": {"location": "Bangalore", "activity": "exercise"}, "confidence": 0.8}
+  },
+  {
+    "query": "What's the current AQI in Lucknow?",
+    "response": {"intent": "current_reading", "entities": {"location": "Lucknow", "metric": "aqi"}, "confidence": 0.95}
+  },
+  {
+    "query": "Show me PM10 levels in Chennai",
+    "response": {"intent": "current_reading", "entities": {"location": "Chennai", "metric": "pm10"}, "confidence": 0.92}
+  },
+  {
+    "query": "Kolkata air quality right now",
+    "response": {"intent": "current_reading", "entities": {"location": "Kolkata", "metric": "aqi"}, "confidence": 0.93}
+  },
+  {
+    "query": "What's the pollution level in Hyderabad?",
+    "response": {"intent": "current_reading", "entities": {"location": "Hyderabad", "metric": "aqi"}, "confidence": 0.91}
+  },
+  {
+    "query": "Current NO2 readings in Pune",
+    "response": {"intent": "current_reading", "entities": {"location": "Pune", "metric": "no2"}, "confidence": 0.89}
+  },
+  {
+    "query": "SO2 concentration in Ahmedabad",
+    "response": {"intent": "current_reading", "entities": {"location": "Ahmedabad", "metric": "so2"}, "confidence": 0.88}
+  },
+  {
+    "query": "Jaipur ozone levels",
+    "response": {"intent": "current_reading", "entities": {"location": "Jaipur", "metric": "o3"}, "confidence": 0.87}
+  },
+  {
+    "query": "CO levels in Chandigarh today",
+    "response": {"intent": "current_reading", "entities": {"location": "Chandigarh", "metric": "co"}, "confidence": 0.9}
+  },
+  {
+    "query": "What's the air quality like in Bhopal?",
+    "response": {"intent": "current_reading", "entities": {"location": "Bhopal", "metric": "aqi"}, "confidence": 0.92}
+  },
+  {
+    "query": "Indore PM2.5 concentration",
+    "response": {"intent": "current_reading", "entities": {"location": "Indore", "metric": "pm25"}, "confidence": 0.91}
+  },
+  {
+    "query": "Compare PM2.5 between Lucknow and Kanpur",
+    "response": {"intent": "comparison", "entities": {"locations": ["Lucknow", "Kanpur"], "metric": "pm25"}, "confidence": 0.88}
+  },
+  {
+    "query": "Which is more polluted, Gurgaon or Noida?",
+    "response": {"intent": "comparison", "entities": {"locations": ["Gurgaon", "Noida"], "metric": "aqi"}, "confidence": 0.87}
+  },
+  {
+    "query": "Compare air quality in Chennai and Coimbatore",
+    "response": {"intent": "comparison", "entities": {"locations": ["Chennai", "Coimbatore"], "metric": "aqi"}, "confidence": 0.86}
+  },
+  {
+    "query": "Pollution comparison between Patna and Ranchi",
+    "response": {"intent": "comparison", "entities": {"locations": ["Patna", "Ranchi"], "metric": "aqi"}, "confidence": 0.84}
+  },
+  {
+    "query": "Compare NO2 levels in Mumbai and Pune",
+    "response": {"intent": "comparison", "entities": {"locations": ["Mumbai", "Pune"], "metric": "no2"}, "confidence": 0.83}
+  },
+  {
+    "query": "Which has better air quality, Shimla or Manali?",
+    "response": {"intent": "comparison", "entities": {"locations": ["Shimla", "Manali"], "metric": "aqi"}, "confidence": 0.85}
+  },
+  {
+    "query": "Compare PM10 between Ahmedabad and Surat",
+    "response": {"intent": "comparison", "entities": {"locations": ["Ahmedabad", "Surat"], "metric": "pm10"}, "confidence": 0.82}
+  },
+  {
+    "query": "Ozone comparison between Delhi and Jaipur",
+    "response": {"intent": "comparison", "entities": {"locations": ["Delhi", "Jaipur"], "metric": "o3"}, "confidence": 0.81}
+  },
+  {
+    "query": "Compare air quality across all metro cities",
+    "response": {"intent": "comparison", "entities": {"locations": ["Delhi", "Mumbai", "Kolkata", "Chennai", "Bangalore", "Hyderabad"], "metric": "aqi"}, "confidence": 0.8}
+  },
+  {
+    "query": "Which city has the worst PM2.5 levels?",
+    "response": {"intent": "comparison", "entities": {"locations": "all", "metric": "pm25", "ranking": "worst"}, "confidence": 0.85}
+  },
+  {
+    "query": "PM2.5 trend in Delhi for past week",
+    "response": {"intent": "trend", "entities": {"location": "Delhi", "metric": "pm25", "duration": 7, "unit": "days"}, "confidence": 0.92}
+  },
+  {
+    "query": "How has AQI changed in Mumbai this month?",
+    "response": {"intent": "trend", "entities": {"location": "Mumbai", "metric": "aqi", "duration": 1, "unit": "month"}, "confidence": 0.89}
+  },
+  {
+    "query": "Kolkata air quality trend last 48 hours",
+    "response": {"intent": "trend", "entities": {"location": "Kolkata", "metric": "aqi", "duration": 48, "unit": "hours"}, "confidence": 0.91}
+  },
+  {
+    "query": "Show NO2 trend in Chennai for past 3 days",
+    "response": {"intent": "trend", "entities": {"location": "Chennai", "metric": "no2", "duration": 3, "unit": "days"}, "confidence": 0.88}
+  },
+  {
+    "query": "Bangalore PM10 levels over last month",
+    "response": {"intent": "trend", "entities": {"location": "Bangalore", "metric": "pm10", "duration": 1, "unit": "month"}, "confidence": 0.87}
+  },
+  {
+    "query": "Hyderabad air quality pattern this week",
+    "response": {"intent": "trend", "entities": {"location": "Hyderabad", "metric": "aqi", "duration": 1, "unit": "week"}, "confidence": 0.86}
+  },
+  {
+    "query": "Lucknow PM2.5 trend since yesterday",
+    "response": {"intent": "trend", "entities": {"location": "Lucknow", "metric": "pm25", "duration": 1, "unit": "day"}, "confidence": 0.9}
+  },
+  {
+    "query": "How has air quality changed in Pune this year?",
+    "response": {"intent": "trend", "entities": {"location": "Pune", "metric": "aqi", "duration": 1, "unit": "year"}, "confidence": 0.85}
+  },
+  {
+    "query": "Ahmedabad SO2 levels over past quarter",
+    "response": {"intent": "trend", "entities": {"location": "Ahmedabad", "metric": "so2", "duration": 3, "unit": "months"}, "confidence": 0.84}
+  },
+  {
+    "query": "Jaipur ozone trend for last 72 hours",
+    "response": {"intent": "trend", "entities": {"location": "Jaipur", "metric": "o3", "duration": 72, "unit": "hours"}, "confidence": 0.83}
+  },
+  {
+    "query": "Is it safe to jog in Delhi today?",
+    "response": {"intent": "health", "entities": {"location": "Delhi", "activity": "jog"}, "confidence": 0.85}
+  },
+  {
+    "query": "Can children play outside in Mumbai now?",
+    "response": {"intent": "health", "entities": {"location": "Mumbai", "activity": "play outside", "demographic": "children"}, "confidence": 0.84}
+  },
+  {
+    "query": "Is Kolkata's air quality safe for elderly?",
+    "response": {"intent": "health", "entities": {"location": "Kolkata", "demographic": "elderly"}, "confidence": 0.83}
+  },
+  {
+    "query": "Should I wear mask in Lucknow today?",
+    "response": {"intent": "health", "entities": {"location": "Lucknow", "protection": "mask"}, "confidence": 0.86}
+  },
+  {
+    "query": "Is Chennai air quality good for running?",
+    "response": {"intent": "health", "entities": {"location": "Chennai", "activity": "running"}, "confidence": 0.82}
+  },
+  {
+    "query": "Health risks of current Bangalore air",
+    "response": {"intent": "health", "entities": {"location": "Bangalore", "info": "risks"}, "confidence": 0.81}
+  },
+  {
+    "query": "Is it safe for asthma patients in Hyderabad today?",
+    "response": {"intent": "health", "entities": {"location": "Hyderabad", "condition": "asthma"}, "confidence": 0.87}
+  },
+  {
+    "query": "Should pregnant women avoid outdoors in Pune?",
+    "response": {"intent": "health", "entities": {"location": "Pune", "demographic": "pregnant women", "activity": "outdoors"}, "confidence": 0.85}
+  },
+  {
+    "query": "Air quality health advisory for Ahmedabad",
+    "response": {"intent": "health", "entities": {"location": "Ahmedabad", "info": "advisory"}, "confidence": 0.84}
+  },
+  {
+    "query": "Is Jaipur air safe for cycling?",
+    "response": {"intent": "health", "entities": {"location": "Jaipur", "activity": "cycling"}, "confidence": 0.83}
+  },
+  {
+    "query": "What's the current PM2.5 in Guwahati?",
+    "response": {"intent": "current_reading", "entities": {"location": "Guwahati", "metric": "pm25"}, "confidence": 0.94}
+  },
+  {
+    "query": "Nagpur air quality index now",
+    "response": {"intent": "current_reading", "entities": {"location": "Nagpur", "metric": "aqi"}, "confidence": 0.93}
+  },
+  {
+    "query": "Show me Varanasi pollution levels",
+    "response": {"intent": "current_reading", "entities": {"location": "Varanasi", "metric": "aqi"}, "confidence": 0.92}
+  },
+  {
+    "query": "What's the AQI in Agra right now?",
+    "response": {"intent": "current_reading", "entities": {"location": "Agra", "metric": "aqi"}, "confidence": 0.91}
+  },
+  {
+    "query": "Amritsar PM10 readings",
+    "response": {"intent": "current_reading", "entities": {"location": "Amritsar", "metric": "pm10"}, "confidence": 0.9}
+  },
+  {
+    "query": "Current NO2 levels in Dehradun",
+    "response": {"intent": "current_reading", "entities": {"location": "Dehradun", "metric": "no2"}, "confidence": 0.89}
+  },
+  {
+    "query": "Raipur SO2 concentration today",
+    "response": {"intent": "current_reading", "entities": {"location": "Raipur", "metric": "so2"}, "confidence": 0.88}
+  },
+  {
+    "query": "What's the CO level in Bhubaneswar?",
+    "response": {"intent": "current_reading", "entities": {"location": "Bhubaneswar", "metric": "co"}, "confidence": 0.87}
+  },
+  {
+    "query": "Thiruvananthapuram air quality now",
+    "response": {"intent": "current_reading", "entities": {"location": "Thiruvananthapuram", "metric": "aqi"}, "confidence": 0.86}
+  },
+  {
+    "query": "Talkatora PM2.5 levels",
+    "response": {"intent": "current_reading", "entities": {"location": "Talkatora", "metric": "pm25"}, "confidence": 0.94}
+  },
+  {
+    "query": "Gomti Nagar air quality",
+    "response": {"intent": "current_reading", "entities": {"location": "Gomti Nagar", "metric": "aqi"}, "confidence": 0.93}
+  },
+  {
+    "query": "Aliganj pollution status",
+    "response": {"intent": "current_reading", "entities": {"location": "Aliganj", "metric": "aqi"}, "confidence": 0.92}
+  },
+  {
+    "query": "What's the AQI in Rajajipuram?",
+    "response": {"intent": "current_reading", "entities": {"location": "Rajajipuram", "metric": "aqi"}, "confidence": 0.91}
+  },
+  {
+    "query": "Alamnagar air quality index",
+    "response": {"intent": "current_reading", "entities": {"location": "Alamnagar", "metric": "aqi"}, "confidence": 0.9}
+  },
+  {
+    "query": "Lalbagh pollution levels",
+    "response": {"intent": "current_reading", "entities": {"location": "Lalbagh", "metric": "aqi"}, "confidence": 0.89}
+  },
+  {
+    "query": "Compare Talkatora and Gomti Nagar air quality",
+    "response": {"intent": "comparison", "entities": {"locations": ["Talkatora", "Gomti Nagar"], "metric": "aqi"}, "confidence": 0.88}
+  },
+  {
+    "query": "Which is more polluted, Aliganj or Rajajipuram?",
+    "response": {"intent": "comparison", "entities": {"locations": ["Aliganj", "Rajajipuram"], "metric": "aqi"}, "confidence": 0.87}
+  },
+  {
+    "query": "Compare PM2.5 in Alamnagar and Lalbagh",
+    "response": {"intent": "comparison", "entities": {"locations": ["Alamnagar", "Lalbagh"], "metric": "pm25"}, "confidence": 0.86}
+  },
+  {
+    "query": "Talkatora air quality trend last week",
+    "response": {"intent": "trend", "entities": {"location": "Talkatora", "metric": "aqi", "duration": 1, "unit": "week"}, "confidence": 0.89}
+  },
+  {
+    "query": "Gomti Nagar PM2.5 pattern last 3 days",
+    "response": {"intent": "trend", "entities": {"location": "Gomti Nagar", "metric": "pm25", "duration": 3, "unit": "days"}, "confidence": 0.88}
+  },
+  {
+    "query": "Aliganj pollution trend this month",
+    "response": {"intent": "trend", "entities": {"location": "Aliganj", "metric": "aqi", "duration": 1, "unit": "month"}, "confidence": 0.87}
+  },
+  {
+    "query": "Is it safe to exercise in Talkatora today?",
+    "response": {"intent": "health", "entities": {"location": "Talkatora", "activity": "exercise"}, "confidence": 0.86}
+  },
+  {
+    "query": "Health advisory for Gomti Nagar residents",
+    "response": {"intent": "health", "entities": {"location": "Gomti Nagar", "info": "advisory"}, "confidence": 0.85}
+  },
+  {
+    "query": "Should children play outside in Aliganj?",
+    "response": {"intent": "health", "entities": {"location": "Aliganj", "activity": "play outside", "demographic": "children"}, "confidence": 0.84}
+  },
+  {
+    "query": "What's the PM2.5 level in Cantonment Ward 1?",
+    "response": {"intent": "current_reading", "entities": {"location": "Cantonment Ward 1", "metric": "pm25"}, "confidence": 0.93}
+  },
+  {
+    "query": "Hazratganj Ward 1 air quality",
+    "response": {"intent": "current_reading", "entities": {"location": "Hazratganj Ward 1", "metric": "aqi"}, "confidence": 0.92}
+  },
+  {
+    "query": "Butler Palace Ward pollution status",
+    "response": {"intent": "current_reading", "entities": {"location": "Butler Palace Ward", "metric": "aqi"}, "confidence": 0.91}
+  },
+  {
+    "query": "Talkatora Industrial Ward PM10 levels",
+    "response": {"intent": "current_reading", "entities": {"location": "Talkatora Industrial Ward", "metric": "pm10"}, "confidence": 0.9}
+  },
+  {
+    "query": "Alamnagar Central Ward air quality",
+    "response": {"intent": "current_reading", "entities": {"location": "Alamnagar Central Ward", "metric": "aqi"}, "confidence": 0.89}
+  },
+  {
+    "query": "Compare Cantonment Ward 1 and Talkatora Industrial Ward",
+    "response": {"intent": "comparison", "entities": {"locations": ["Cantonment Ward 1", "Talkatora Industrial Ward"], "metric": "aqi"}, "confidence": 0.88}
+  },
+  {
+    "query": "Which ward has the best air quality in Lucknow?",
+    "response": {"intent": "comparison", "entities": {"locations": "Lucknow wards", "metric": "aqi", "ranking": "best"}, "confidence": 0.87}
+  },
+  {
+    "query": "Cantonment Ward 1 air quality trend this week",
+    "response": {"intent": "trend", "entities": {"location": "Cantonment Ward 1", "metric": "aqi", "duration": 1, "unit": "week"}, "confidence": 0.86}
+  },
+  {
+    "query": "Is it safe for elderly in Talkatora Industrial Ward?",
+    "response": {"intent": "health", "entities": {"location": "Talkatora Industrial Ward", "demographic": "elderly"}, "confidence": 0.85}
+  },
+  {
+    "query": "What's the air quality in Ahmamau village?",
+    "response": {"intent": "current_reading", "entities": {"location": "Ahmamau", "metric": "aqi"}, "confidence": 0.92}
+  },
+  {
+    "query": "Banthra Sikandarpur pollution levels",
+    "response": {"intent": "current_reading", "entities": {"location": "Banthra Sikandarpur", "metric": "aqi"}, "confidence": 0.91}
+  },
+  {
+    "query": "Compare air quality in Malihabad and Kakori",
+    "response": {"intent": "comparison", "entities": {"locations": ["Malihabad", "Kakori"], "metric": "aqi"}, "confidence": 0.87}
+  },
+  {
+    "query": "Which village has worst air quality near Lucknow?",
+    "response": {"intent": "comparison", "entities": {"locations": "Lucknow villages", "metric": "aqi", "ranking": "worst"}, "confidence": 0.86}
+  },
+  {
+    "query": "Bakshi Ka Talab air quality trend last month",
+    "response": {"intent": "trend", "entities": {"location": "Bakshi Ka Talab", "metric": "aqi", "duration": 1, "unit": "month"}, "confidence": 0.85}
+  },
+  {
+    "query": "Is Mohanlalganj air safe for children?",
+    "response": {"intent": "health", "entities": {"location": "Mohanlalganj", "demographic": "children"}, "confidence": 0.84}
+  },
+  {
+    "query": "What's the current SO2 level in Lucknow?",
+    "response": {"intent": "current_reading", "entities": {"location": "Lucknow", "metric": "so2"}, "confidence": 0.93}
+  },
+  {
+    "query": "Ozone concentration in Delhi",
+    "response": {"intent": "current_reading", "entities": {"location": "Delhi", "metric": "o3"}, "confidence": 0.92}
+  },
+  {
+    "query": "Mumbai CO readings",
+    "response": {"intent": "current_reading", "entities": {"location": "Mumbai", "metric": "co"}, "confidence": 0.91}
+  },
+  {
+    "query": "Compare SO2 levels between Delhi and Lucknow",
+    "response": {"intent": "comparison", "entities": {"locations": ["Delhi", "Lucknow"], "metric": "so2"}, "confidence": 0.87}
+  },
+  {
+    "query": "Which city has highest ozone pollution?",
+    "response": {"intent": "comparison", "entities": {"locations": "all", "metric": "o3", "ranking": "highest"}, "confidence": 0.86}
+  },
+  {
+    "query": "CO trend in Delhi last 48 hours",
+    "response": {"intent": "trend", "entities": {"location": "Delhi", "metric": "co", "duration": 48, "unit": "hours"}, "confidence": 0.85}
+  },
+  {
+    "query": "Is current ozone level in Mumbai harmful?",
+    "response": {"intent": "health", "entities": {"location": "Mumbai", "metric": "o3"}, "confidence": 0.84}
+  },
+  {
+    "query": "What pollutant is most concerning in Lucknow today?",
+    "response": {"intent": "comparison", "entities": {"location": "Lucknow", "metric": "all", "ranking": "worst"}, "confidence": 0.83}
+  },
+  {
+    "query": "Air quality forecast for Delhi tomorrow",
+    "response": {"intent": "forecast", "entities": {"location": "Delhi", "metric": "aqi", "time": "tomorrow"}, "confidence": 0.82}
+  },
+  {
+    "query": "Will Mumbai air quality improve next week?",
+    "response": {"intent": "forecast", "entities": {"location": "Mumbai", "metric": "aqi", "time": "next week"}, "confidence": 0.81}
+  },
+  {
+    "query": "Lucknow pollution prediction for weekend",
+    "response": {"intent": "forecast", "entities": {"location": "Lucknow", "metric": "aqi", "time": "weekend"}, "confidence": 0.8}
+  },
+  {
+    "query": "What's causing high pollution in Talkatora?",
+    "response": {"intent": "source", "entities": {"location": "Talkatora", "info": "causes"}, "confidence": 0.79}
+  },
+  {
+    "query": "Main pollution sources in Delhi",
+    "response": {"intent": "source", "entities": {"location": "Delhi", "info": "sources"}, "confidence": 0.78}
+  },
+  {
+    "query": "What contributes to Lucknow's poor air quality?",
+    "response": {"intent": "source", "entities": {"location": "Lucknow", "info": "contributors"}, "confidence": 0.77}
+  }
+]
